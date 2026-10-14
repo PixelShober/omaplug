@@ -1661,6 +1661,28 @@ Panel {
   // follows the same pattern with `omarchy bar move` instead of touching
   // the shell registry (which user panels no longer reach).
   property var barLayoutCache: ({ left: [], center: [], right: [] })
+  readonly property var hiddenWidgets: {
+    var ids = root.setting("hiddenWidgets", {})
+    if (Array.isArray(ids)) return ids
+    return ids && typeof ids === "object"
+      ? Object.keys(ids).filter(function(id) { return ids[id] === true }) : []
+  }
+  property Process iconVisibilityProcess: Process {
+    onExited: function(exitCode) {
+      if (exitCode !== 0) root.moveSummary = "Could not save bar icon visibility. Try again."
+    }
+  }
+
+  function setIconHidden(id, hidden) {
+    if (root.iconVisibilityProcess.running || !root.canMoveWidget(id)) return
+    var ids = {}
+    for (var i = 0; i < root.hiddenWidgets.length; i++) ids[root.hiddenWidgets[i]] = true
+    if (hidden) ids[String(id)] = true
+    else delete ids[String(id)]
+    root.iconVisibilityProcess.command = ["omarchy", "bar", "set", root.moduleName,
+      "hiddenWidgets", JSON.stringify(ids), "--json"]
+    root.iconVisibilityProcess.running = true
+  }
   property Process barLayoutProcess: Process {
     onExited: function(exitCode) {
       if (exitCode === 0) root.applyBarLayout(barLayoutStdout.text)
@@ -2462,6 +2484,9 @@ Panel {
       panelBackground: root.panelBackground
       canMove: rowMenuOverlay.plugin ? root.canMoveWidget(rowMenuOverlay.plugin.id) : false
       currentSection: rowMenuOverlay.plugin ? root.barSectionFor(rowMenuOverlay.plugin.id) : ""
+      iconHidden: rowMenuOverlay.plugin
+        ? root.hiddenWidgets.indexOf(rowMenuOverlay.plugin.id) !== -1 : false
+      visibilityBusy: root.iconVisibilityProcess.running
 
       onCloseRequested: root.closeRowMenu()
       onEnabledChangeRequested: function(pluginId, enabled) {
@@ -2472,6 +2497,7 @@ Panel {
       onRemovalRequested: function(pluginId) { root.removePlugin(pluginId) }
       onMoveRequested: function(pluginId, section) { root.moveWidgetToSection(pluginId, section) }
       onShortcutRequested: function(pluginId, name) { root.openShortcut(pluginId, name) }
+      onIconHiddenRequested: function(pluginId, hidden) { root.setIconHidden(pluginId, hidden) }
     }
 
     Dialogs.Shortcut {

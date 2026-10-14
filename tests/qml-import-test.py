@@ -21,7 +21,7 @@ with tempfile.TemporaryDirectory(prefix="omaplug-qml-") as directory:
     (imports / "qs").mkdir()
     for module in ("Commons", "Ui"):
         (imports / "qs" / module).symlink_to(shell / module, target_is_directory=True)
-    files = [root / "Panel.qml", root / "BarWidget.qml", *sorted((root / "panel").rglob("*.qml"))]
+    files = [root / "Panel.qml", root / "BarWidget.qml", root / "BarVisibility.qml", *sorted((root / "panel").rglob("*.qml"))]
     result = subprocess.run([lint, "-I", directory, "--json", "-", *map(str, files)],
                             capture_output=True, text=True, timeout=60)
     report = json.loads(result.stdout)

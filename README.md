@@ -2,6 +2,8 @@
 
 **A small tool for managing your Omarchy plugins.**
 
+This fork adds hidden bar icons with working keyboard shortcuts and fixes shortcut availability for plugins with multiple kinds. Based on [Omaplug by Fross](https://github.com/fross100/omaplug).
+
 [![Marketplace](https://img.shields.io/badge/Omarchy_Marketplace-listed-blue)](https://plugins.omarchy.org/plugin.html?id=omaplug) [![Verified](https://img.shields.io/badge/Automated_Security_Baseline-verified-brightgreen)](https://github.com/omacom/omarchy-plugin-marketplace/blob/main/SECURITY.md#automated-security-baseline) [![hearts](https://stats.ussego.com/api/badges/hearts/omaplug.svg)](https://stats.ussego.com/plugins/omaplug) [![views](https://stats.ussego.com/api/badges/views/omaplug.svg)](https://stats.ussego.com/plugins/omaplug) [![copies](https://stats.ussego.com/api/badges/copies/omaplug.svg)](https://stats.ussego.com/plugins/omaplug)
 
 Access it right from the Omarchy bar — it gives you a centralized place to view and organize the plugins you have installed. Here are a few things you can use it for:
@@ -69,7 +71,7 @@ Omaplug is listed on the marketplace: [plugins.omarchy.org/plugin.html?id=omaplu
 ## Install
 
 ```bash
-omarchy plugin add https://github.com/fross100/omaplug --enable
+omarchy plugin add https://github.com/PixelShober/omaplug --enable
 ```
 
 ## Settings
@@ -84,7 +86,15 @@ Settings also provides the automatic update check switch and interval.
 
 Choose **Keyboard shortcut** from a plugin's **⋮** menu, then press your desired combination, such as `Super + Ctrl + Alt + P`. Omaplug checks live Hyprland bindings and saves automatically if the combination is free. If it is taken, the existing shortcut stays unchanged and you can press another combination. **Remove shortcut** removes only that plugin's Omaplug-managed binding. **Done** or Escape closes the recorder.
 
-This editor uses Omarchy's `~/.config/hypr/bindings.lua`, preserves existing bindings, and reloads Hyprland after a change. It refuses conflicting or unresolved physical-key combinations. Plugins must remain enabled; bar widgets must stay on the bar and expose a working popup. Hiding bar icons is not part of this feature.
+This editor uses Omarchy's `~/.config/hypr/bindings.lua`, preserves existing bindings, and reloads Hyprland after a change. It refuses conflicting or unresolved physical-key combinations. Plugins must remain enabled; bar widgets must stay loaded in the bar layout and expose a working popup.
+
+## Hide bar icons
+
+Choose **Hide bar icon** from a plugin's **⋮** menu to hide its widget while keeping the plugin loaded and its shortcut working. **Show bar icon** restores it in its original position. Set a keyboard shortcut first if you want to open the plugin without clicking its icon. This also works for Omaplug itself.
+
+The choice is stored as `hiddenWidgets` in Omaplug's own bar-layout entry in `shell.json`. It survives shell restarts and does not edit other plugins' source files. Omaplug must remain enabled in the bar layout for hiding to apply; disabling or removing Omaplug restores the icons.
+
+This feature uses the stock Omarchy bar's widget scene structure because there is no public visibility API. Replacement bars are not supported, and future Omarchy bar changes may require updating the adapter. Keep the plugin's git origin pointed at this fork when updating to retain the feature.
 
 ## Update
 

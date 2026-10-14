@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 import qs.Commons
 import qs.Ui
@@ -6,6 +7,17 @@ import qs.Ui
 BarWidget {
     id: root
     moduleName: "omaplug"
+
+    readonly property var hiddenWidgets: {
+        var ids = root.setting("hiddenWidgets", {})
+        if (Array.isArray(ids)) return ids
+        return ids && typeof ids === "object"
+            ? Object.keys(ids).filter(function(id) { return ids[id] === true }) : []
+    }
+    property BarVisibility iconVisibility: BarVisibility {
+        sceneRoot: root.QsWindow.window ? root.QsWindow.window.contentItem : null
+        hiddenWidgets: root.hiddenWidgets
+    }
 
     // The bar's findPanelWidget (Bar.qml) requires open/close/opened on the
     // bar-widget root, and the popout coordinator compares against
